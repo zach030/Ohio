@@ -51,6 +51,7 @@ func (s *Server) Start() {
 						fmt.Println("receive buf err,", err)
 						continue
 					}
+					fmt.Printf("receive client buf %s,cnt %d", buf, cnt)
 					//回写功能
 					if _, err := conn.Write(buf[0:cnt]); err != nil {
 						fmt.Println("write back buf error,", err)
