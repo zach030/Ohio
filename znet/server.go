@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"Zinx/ziface"
 	"fmt"
 	"net"
 )
@@ -15,11 +16,12 @@ type Server struct {
 	IP string
 	//端口
 	Port int
+	//当前server添加router
+	Router ziface.IRouter
 }
 
 func (s *Server) Start() {
 	fmt.Printf("[Start] Server Listening at IP : %s, Port:%d, is starting\n\n", s.IP, s.Port)
-
 	go func() {
 		// 1 获取一个tcp addr
 		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
@@ -30,35 +32,24 @@ func (s *Server) Start() {
 		// 2 监听服务器地址
 		listener, err := net.ListenTCP(s.IPVersion, addr)
 		if err != nil {
-			fmt.Println("listen ", s.IPVersion, " error ", err)
+			fmt.Println("listen ", s.IPVersion, " error: ", err)
 			return
 		}
 		fmt.Println("Start zinx Server successfully, ", s.Name, " Listening...")
+		var cid uint32
+		cid = 0
 		// 3 阻塞的等待客户端连接，处理客户端业务
 		for {
 			//如果有客户端连接，会返回
 			conn, err := listener.AcceptTCP()
 			if err != nil {
-				fmt.Println("Accept err", err)
+				fmt.Println("Accept error:", err)
 				continue
 			}
 			//客户端已经建立连接,做一个回写业务
-			go func() {
-				for {
-					buf := make([]byte, 512)
-					cnt, err := conn.Read(buf)
-					if err != nil {
-						fmt.Println("receive buf err,", err)
-						continue
-					}
-					fmt.Printf("receive client buf %s,cnt %d", buf, cnt)
-					//回写功能
-					if _, err := conn.Write(buf[0:cnt]); err != nil {
-						fmt.Println("write back buf error,", err)
-						continue
-					}
-				}
-			}()
+			dealConn := NewConnection(conn, cid, s.Router)
+			cid++
+			go dealConn.Start()
 		}
 	}()
 
@@ -76,13 +67,19 @@ func (s *Server) Serve() {
 	select {}
 }
 
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
+	fmt.Println("Add Router Successfully!")
+}
+
 //初始化server的方法
-func NewServer(name string) Server {
-	s := Server{
+func NewServer(name string) ziface.IServer {
+	s := &Server{
 		Name:      name,
 		IPVersion: "tcp4",
 		IP:        "0.0.0.0",
 		Port:      8999,
+		Router:    nil,
 	}
 	return s
 }
