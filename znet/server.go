@@ -21,9 +21,12 @@ type Server struct {
 	Router ziface.IRouter
 }
 
+//The writer who wrote the codes below is a fat and lazy pig. -That's true.But,he has a beautiful girlfriend that everyone envies.
 func (s *Server) Start() {
-	fmt.Printf("[Zinx] Server Name:%s, listener at IP:%s,Port:%d is starting", utils.GlobalObject.Name, utils.GlobalObject.Host, utils.GlobalObject.TcpPort)
-	fmt.Printf("[Start] Server Listening at IP : %s, Port:%d, is starting\n\n", s.IP, s.Port)
+	fmt.Printf("[Zinx] Server Name:%s, listener at IP:%s,Port:%d is starting\n",
+		utils.GlobalObject.Name, utils.GlobalObject.Host, utils.GlobalObject.TcpPort)
+	fmt.Printf("[Zinx] Version %s,MaxConn %d, MaxPackageSize %d\n",
+		utils.GlobalObject.Version, utils.GlobalObject.MaxConn, utils.GlobalObject.MaxPackageSize)
 	go func() {
 		// 1 获取一个tcp addr
 		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))

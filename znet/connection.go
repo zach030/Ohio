@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"Zinx/utils"
 	"Zinx/ziface"
 	"fmt"
 	"net"
@@ -23,11 +24,11 @@ type Connection struct {
 //初始化连接模块的方法
 func NewConnection(conn *net.TCPConn, connID uint32, router ziface.IRouter) *Connection {
 	c := &Connection{
-		Conn:      conn,
-		ConnID:    connID,
-		isClosed:  false,
-		Router: router,
-		ExitChan:  make(chan bool, 1),
+		Conn:     conn,
+		ConnID:   connID,
+		isClosed: false,
+		Router:   router,
+		ExitChan: make(chan bool, 1),
 	}
 	return c
 }
@@ -39,7 +40,7 @@ func (c *Connection) StartReader() {
 	defer c.Stop()
 	for {
 		//读取客户端数据到buf中
-		buf := make([]byte, 512)
+		buf := make([]byte, utils.GlobalObject.MaxPackageSize)
 		_, err := c.Conn.Read(buf)
 		if err != nil {
 			fmt.Println("receive buf err ", err)
@@ -50,7 +51,7 @@ func (c *Connection) StartReader() {
 			data: buf,
 		}
 		//执行注册的路由方法
-		go func(request ziface.IRequest){
+		go func(request ziface.IRequest) {
 			c.Router.PreHandle(request)
 			c.Router.Handle(request)
 			c.Router.PostHandle(request)
