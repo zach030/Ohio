@@ -17,8 +17,8 @@ type Server struct {
 	IP string
 	//端口
 	Port int
-	//当前server添加router
-	Router ziface.IRouter
+	//当前server的消息管理模块，绑定消息id与处理业务api
+	MsgHandler ziface.IMsgHandler
 }
 
 //The writer who wrote the codes below is a fat and lazy pig. -That's true.But,he has a beautiful girlfriend that everyone envies.
@@ -52,7 +52,7 @@ func (s *Server) Start() {
 				continue
 			}
 			//客户端已经建立连接,做一个回写业务
-			dealConn := NewConnection(conn, cid, s.Router)
+			dealConn := NewConnection(conn, cid, s.MsgHandler)
 			cid++
 			go dealConn.Start()
 		}
@@ -72,8 +72,8 @@ func (s *Server) Serve() {
 	select {}
 }
 
-func (s *Server) AddRouter(router ziface.IRouter) {
-	s.Router = router
+func (s *Server) AddRouter(msgId uint32,router ziface.IRouter) {
+	s.MsgHandler.AddRouter(msgId,router)
 	fmt.Println("Add Router Successfully!")
 }
 
@@ -84,7 +84,7 @@ func NewServer(name string) ziface.IServer {
 		IPVersion: "tcp4",
 		IP:        utils.GlobalObject.Host,
 		Port:      utils.GlobalObject.TcpPort,
-		Router:    nil,
+		MsgHandler: NewMsgHandle(),
 	}
 	return s
 }

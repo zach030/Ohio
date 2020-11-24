@@ -22,11 +22,11 @@ var GlobalObject *GlobalObj
 
 // 加载json
 func (s *GlobalObj) Reload() {
-	data, err := ioutil.ReadFile("myDemo/ZinxV0.4/conf/zinx.json")
+	data, err := ioutil.ReadFile("myDemo/ZinxV0.5/conf/zinx.json")
 	if err != nil {
 		panic(err)
 	}
-	err = json.Unmarshal(data, &GlobalObj{})
+	err = json.Unmarshal(data, s)
 	if err != nil {
 		panic(err)
 	}
