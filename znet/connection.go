@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"Zinx/utils"
 	"Zinx/ziface"
 	"errors"
 	"fmt"
@@ -10,6 +11,8 @@ import (
 
 //当前连接模块
 type Connection struct {
+	//所属server
+	TcpServer ziface.IServer
 	//当前连接的socket tcp 套接字
 	Conn *net.TCPConn
 	//连接的id
@@ -25,8 +28,9 @@ type Connection struct {
 }
 
 //初始化连接模块的方法
-func NewConnection(conn *net.TCPConn, connID uint32, handler ziface.IMsgHandler) *Connection {
+func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, handler ziface.IMsgHandler) *Connection {
 	c := &Connection{
+		TcpServer:  server,
 		Conn:       conn,
 		ConnID:     connID,
 		isClosed:   false,
@@ -34,6 +38,8 @@ func NewConnection(conn *net.TCPConn, connID uint32, handler ziface.IMsgHandler)
 		msgChan:    make(chan []byte),
 		ExitChan:   make(chan bool, 1),
 	}
+	//加入到manager中
+	c.TcpServer.GetConnManager().Add(c)
 	return c
 }
 
@@ -72,10 +78,12 @@ func (c *Connection) StartReader() {
 			conn: c,
 			data: msg,
 		}
-		//执行注册的路由方法
-		//根据定义好的msgid找到业务api
-		go c.MsgHandler.DoMsgHandler(&req)
-		//从路由中，找到注册绑定的conn对应的router调用
+		if utils.GlobalObject.WorkerPoolSize > 0 {
+			c.MsgHandler.SendMsgToTaskQueue(&req)
+		} else {
+			go c.MsgHandler.DoMsgHandler(&req)
+		}
+
 	}
 }
 
@@ -140,6 +148,8 @@ func (c *Connection) Stop() {
 	//关闭管道,回收资源
 	close(c.msgChan)
 	close(c.ExitChan)
+
+	c.TcpServer.GetConnManager().Remove(c)
 }
 
 //获取当前连接绑定的socket conn
