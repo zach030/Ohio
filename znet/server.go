@@ -20,6 +20,10 @@ type Server struct {
 	//当前server的消息管理模块，绑定消息id与处理业务api
 	MsgHandler  ziface.IMsgHandler
 	ConnManager ziface.IConnManager
+	//connection 建立后的hook 函数
+	OnConnStart func(connection ziface.IConnection)
+	//connection 销毁前的hook 函数
+	OnConnStop func(connection ziface.IConnection)
 }
 
 //The writer who wrote the codes below is a fat and lazy pig. -That's true.But,he has a beautiful girlfriend that everyone envies.
@@ -67,7 +71,6 @@ func (s *Server) Start() {
 			go dealConn.Start()
 		}
 	}()
-
 }
 
 func (s *Server) Stop() {
@@ -105,3 +108,28 @@ func NewServer(name string) ziface.IServer {
 func (s *Server) GetConnManager() ziface.IConnManager {
 	return s.ConnManager
 }
+
+//注册start hook func
+func (s *Server) SetOnConnStart(f func(connection ziface.IConnection)) {
+	s.OnConnStart = f
+}
+
+func (s *Server) SetOnConnStop(f func(connection ziface.IConnection)) {
+	s.OnConnStop = f
+}
+
+func (s *Server) CallOnConnStart(connection ziface.IConnection) {
+	if s.OnConnStart!=nil{
+		fmt.Println("----> Call On Conn Start func......")
+		s.OnConnStart(connection)
+	}
+}
+
+func (s *Server) CallOnConnStop(connection ziface.IConnection) {
+	if s.OnConnStop!=nil{
+		fmt.Println("----> Call On Conn Stop func......")
+		s.OnConnStop(connection)
+	}
+}
+
+

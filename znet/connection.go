@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync"
 )
 
 //当前连接模块
@@ -25,18 +26,46 @@ type Connection struct {
 	msgChan chan []byte
 	//消息管理msgid与处理业务api
 	MsgHandler ziface.IMsgHandler
+	//连接属性集合
+	property map[string]interface{}
+	//保护连接属性修改锁
+	propertyLock sync.RWMutex
+}
+
+func (c *Connection) SetProperty(key string, value interface{}) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+	c.property[key] = value
+}
+
+func (c *Connection) GetProperty(key string) (interface{}, error) {
+	c.propertyLock.RLock()
+	defer c.propertyLock.RUnlock()
+	if value, ok := c.property[key]; ok {
+		return value, nil
+	} else {
+		return nil, errors.New("no property found")
+	}
+}
+
+func (c *Connection) RemoveProperty(key string) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+	delete(c.property, key)
 }
 
 //初始化连接模块的方法
 func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, handler ziface.IMsgHandler) *Connection {
 	c := &Connection{
-		TcpServer:  server,
-		Conn:       conn,
-		ConnID:     connID,
-		isClosed:   false,
-		MsgHandler: handler,
-		msgChan:    make(chan []byte),
-		ExitChan:   make(chan bool, 1),
+		TcpServer:    server,
+		Conn:         conn,
+		ConnID:       connID,
+		isClosed:     false,
+		MsgHandler:   handler,
+		msgChan:      make(chan []byte),
+		ExitChan:     make(chan bool, 1),
+		property:     make(map[string]interface{}),
+		propertyLock: sync.RWMutex{},
 	}
 	//加入到manager中
 	c.TcpServer.GetConnManager().Add(c)
@@ -131,6 +160,8 @@ func (c *Connection) Start() {
 	go c.StartReader()
 	//启动从当前连接写数据的业务
 	go c.StartWriter()
+	//调用处理业务的hook函数
+	c.TcpServer.CallOnConnStart(c)
 }
 
 //停止连接，结束当前连接的工作
@@ -142,13 +173,13 @@ func (c *Connection) Stop() {
 	}
 	c.isClosed = true
 	//关闭socket连接
+	c.TcpServer.CallOnConnStop(c)
 	c.Conn.Close()
 	//告知writer退出
 	c.ExitChan <- true
 	//关闭管道,回收资源
 	close(c.msgChan)
 	close(c.ExitChan)
-
 	c.TcpServer.GetConnManager().Remove(c)
 }
 

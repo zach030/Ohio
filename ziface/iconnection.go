@@ -16,7 +16,9 @@ type IConnection interface {
 	RemoteAddr() net.Addr
 	//发送数据，发送给远程客户端
 	SendMsg(id uint32,data []byte) error
+	//设置
+	SetProperty(key string,value interface{})
+	GetProperty(key string)(interface{},error)
+	RemoveProperty(key string)
 }
 
-//定义一个处理链接业务的方法
-type HandleFunc func(*net.TCPConn, []byte, int) error
