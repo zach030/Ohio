@@ -1,3 +1,1 @@
-module Zinx
-
-go 1.14
+module Ohio

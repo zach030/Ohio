@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Zinx/ziface"
-	"Zinx/znet"
+	"Ohio/ziface"
+	"Ohio/znet"
 	"fmt"
 )
 
@@ -23,10 +23,10 @@ func (p *PingRouter) Handle(request ziface.IRequest) {
 	}
 }
 
-/*基于zinx框架开发的服务器应用程序*/
+/*基于Ohio框架开发的服务器应用程序*/
 func main() {
 	// 1 创建server句柄
-	s := znet.NewServer("zinx V0.5")
+	s := znet.NewServer("ohio V0.5")
 	// 2 添加自定义router
 	s.AddRouter(&PingRouter{})
 	// 3 启动server

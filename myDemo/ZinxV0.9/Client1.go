@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Zinx/znet"
+	"Ohio/znet"
 	"fmt"
 	"io"
 	"net"
@@ -21,7 +21,7 @@ func main() {
 	for {
 		//发送封包的msg消息
 		dp := znet.NewDataPack()
-		msgBinary, err := dp.Pack(znet.NewMsgPackage(1, []byte("Zinx V0.7 client1 test message")))
+		msgBinary, err := dp.Pack(znet.NewMsgPackage(1, []byte("Ohio V0.7 client1 test message")))
 		if err != nil {
 			fmt.Println("Pack error:", err)
 			return

@@ -1,8 +1,8 @@
 package znet
 
 import (
-	"Zinx/utils"
-	"Zinx/ziface"
+	"Ohio/utils"
+	"Ohio/ziface"
 	"errors"
 	"fmt"
 	"io"

@@ -1,8 +1,8 @@
 package znet
 
 import (
-	"Zinx/utils"
-	"Zinx/ziface"
+	"Ohio/utils"
+	"Ohio/ziface"
 	"fmt"
 	"net"
 )
@@ -28,9 +28,9 @@ type Server struct {
 
 //The writer who wrote the codes below is a fat and lazy pig. -That's true.But,he has a beautiful girlfriend that everyone envies.
 func (s *Server) Start() {
-	fmt.Printf("[Zinx] Server Name:%s, listener at IP:%s,Port:%d is starting\n",
+	fmt.Printf("[Ohio] Server Name:%s, listener at IP:%s,Port:%d is starting\n",
 		utils.GlobalObject.Name, utils.GlobalObject.Host, utils.GlobalObject.TcpPort)
-	fmt.Printf("[Zinx] Version %s,MaxConn %d, MaxPackageSize %d\n",
+	fmt.Printf("[Ohio] Version %s,MaxConn %d, MaxPackageSize %d\n",
 		utils.GlobalObject.Version, utils.GlobalObject.MaxConn, utils.GlobalObject.MaxPackageSize)
 
 	go func() {
@@ -48,7 +48,7 @@ func (s *Server) Start() {
 			fmt.Println("listen ", s.IPVersion, " error: ", err)
 			return
 		}
-		fmt.Println("Start zinx Server successfully, ", s.Name, " Listening...")
+		fmt.Println("Start ohio Server successfully, ", s.Name, " Listening...")
 		var cid uint32
 		cid = 0
 		// 3 阻塞的等待客户端连接，处理客户端业务
@@ -75,7 +75,7 @@ func (s *Server) Start() {
 
 func (s *Server) Stop() {
 	//TODO 将一些服务器的资源，状态，已经开辟的连接信息进行停止或者回收
-	fmt.Println("[STOP] Zinx Server is stop")
+	fmt.Println("[STOP] Ohio Server is stop")
 	s.ConnManager.Clear()
 }
 

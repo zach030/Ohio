@@ -18,7 +18,7 @@ func main() {
 	}
 	for {
 		// 2 连接调用write
-		_, err := conn.Write([]byte("hello zinx v0.4"))
+		_, err := conn.Write([]byte("hello ohio v0.4"))
 		if err != nil {
 			fmt.Println("write conn err,", err)
 			return

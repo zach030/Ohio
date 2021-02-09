@@ -1,2 +1,2 @@
-# zinx
-学习zinx框架
+# Ohio
+学习Ohio框架

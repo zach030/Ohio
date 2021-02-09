@@ -1,7 +1,7 @@
 package znet
 
 import (
-	"Zinx/ziface"
+	"Ohio/ziface"
 	"errors"
 	"fmt"
 	"sync"

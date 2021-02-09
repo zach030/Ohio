@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Zinx/ziface"
-	"Zinx/znet"
+	"Ohio/ziface"
+	"Ohio/znet"
 	"fmt"
 )
 
@@ -23,17 +23,17 @@ func (p *PingRouter) Handle(request ziface.IRequest) {
 	}
 }
 
-type HelloZinxRouter struct {
+type HelloOhioRouter struct {
 	znet.BaseRouter
 }
 
 // test handle router
-func (p *HelloZinxRouter) Handle(request ziface.IRequest) {
-	fmt.Println("Call router: Hello zinx router handle")
+func (p *HelloOhioRouter) Handle(request ziface.IRequest) {
+	fmt.Println("Call router: Hello ohio router handle")
 	//先读取客户端数据，再回写
 	fmt.Println("recv client msg id = ", request.GetMsgID(),
 		" data = ", string(request.GetData()))
-	err := request.GetConnection().SendMsg(1, []byte("Hello zinx"))
+	err := request.GetConnection().SendMsg(1, []byte("Hello ohio"))
 	if err != nil {
 		fmt.Println("call back  ping error:", err)
 	}
@@ -60,13 +60,13 @@ func DoConnStop(connection ziface.IConnection) {
 	}
 }
 
-/*基于zinx框架开发的服务器应用程序*/
+/*基于Ohio框架开发的服务器应用程序*/
 func main() {
 	// 1 创建server句柄
-	s := znet.NewServer("zinx V0.10")
+	s := znet.NewServer("ohio V0.10")
 	// 2 添加自定义router
 	s.AddRouter(0, &PingRouter{})
-	s.AddRouter(1, &HelloZinxRouter{})
+	s.AddRouter(1, &HelloOhioRouter{})
 	// 3 注册hook回调func
 	s.SetOnConnStart(DoConnBegin)
 	s.SetOnConnStop(DoConnStop)
