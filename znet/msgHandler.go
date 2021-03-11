@@ -1,8 +1,8 @@
 package znet
 
 import (
-	"Ohio/utils"
-	"Ohio/ziface"
+	"ohio/utils"
+	"ohio/ziface"
 	"fmt"
 	"strconv"
 )

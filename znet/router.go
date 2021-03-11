@@ -1,6 +1,6 @@
 package znet
 
-import "Ohio/ziface"
+import "ohio/ziface"
 
 //实现router时，先嵌入BaseRouter基类，再根据业务对基类方法进行重写
 type BaseRouter struct {}

@@ -1,10 +1,12 @@
 package znet
 
 import (
-	"Ohio/utils"
-	"Ohio/ziface"
 	"fmt"
+	"github.com/go-kratos/kratos/pkg/conf/paladin"
 	"net"
+	"ohio/utils"
+	"ohio/ziface"
+	"time"
 )
 
 //定义一个server的服务器模块
@@ -26,11 +28,20 @@ type Server struct {
 	OnConnStop func(connection ziface.IConnection)
 }
 
+type ServerConfig struct {
+	Name         string        `dsn:"name"`
+	Network      string        `dsn:"network"`
+	Addr         string        `dsn:"address"`
+	Timeout      time.Duration `dsn:"query.timeout"`
+	ReadTimeout  time.Duration `dsn:"query.readTimeout"`
+	WriteTimeout time.Duration `dsn:"query.writeTimeout"`
+}
+
 //The writer who wrote the codes below is a fat and lazy pig. -That's true.But,he has a beautiful girlfriend that everyone envies.
 func (s *Server) Start() {
-	fmt.Printf("[Ohio] Server Name:%s, listener at IP:%s,Port:%d is starting\n",
+	fmt.Printf("[ohio] Server Name:%s, listener at IP:%s,Port:%d is starting\n",
 		utils.GlobalObject.Name, utils.GlobalObject.Host, utils.GlobalObject.TcpPort)
-	fmt.Printf("[Ohio] Version %s,MaxConn %d, MaxPackageSize %d\n",
+	fmt.Printf("[ohio] Version %s,MaxConn %d, MaxPackageSize %d\n",
 		utils.GlobalObject.Version, utils.GlobalObject.MaxConn, utils.GlobalObject.MaxPackageSize)
 
 	go func() {
@@ -75,7 +86,7 @@ func (s *Server) Start() {
 
 func (s *Server) Stop() {
 	//TODO 将一些服务器的资源，状态，已经开辟的连接信息进行停止或者回收
-	fmt.Println("[STOP] Ohio Server is stop")
+	fmt.Println("[STOP] ohio Server is stop")
 	s.ConnManager.Clear()
 }
 
@@ -94,8 +105,19 @@ func (s *Server) AddRouter(msgId uint32, router ziface.IRouter) {
 
 //初始化server的方法
 func NewServer(name string) ziface.IServer {
+	// todo 新增paladin 加载配置
+	var (
+		cfg ServerConfig
+		ct  paladin.TOML
+	)
+	if err := paladin.Get("http.toml").Unmarshal(&ct); err != nil {
+		return nil
+	}
+	if err := ct.Get("Server").UnmarshalTOML(&cfg); err != nil {
+		return nil
+	}
 	s := &Server{
-		Name:        utils.GlobalObject.Name,
+		Name:        cfg.Name,
 		IPVersion:   "tcp4",
 		IP:          utils.GlobalObject.Host,
 		Port:        utils.GlobalObject.TcpPort,
@@ -119,17 +141,15 @@ func (s *Server) SetOnConnStop(f func(connection ziface.IConnection)) {
 }
 
 func (s *Server) CallOnConnStart(connection ziface.IConnection) {
-	if s.OnConnStart!=nil{
+	if s.OnConnStart != nil {
 		fmt.Println("----> Call On Conn Start func......")
 		s.OnConnStart(connection)
 	}
 }
 
 func (s *Server) CallOnConnStop(connection ziface.IConnection) {
-	if s.OnConnStop!=nil{
+	if s.OnConnStop != nil {
 		fmt.Println("----> Call On Conn Stop func......")
 		s.OnConnStop(connection)
 	}
 }
-
-

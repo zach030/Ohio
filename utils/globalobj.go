@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"Ohio/ziface"
+	"ohio/ziface"
 	"encoding/json"
 	"io/ioutil"
 )
 
-// 存储一切有关Ohio的全局参数，由Ohio.json配置
+// 存储一切有关ohio的全局参数，由ohio.json配置
 
 type GlobalObj struct {
 	TcpServer        ziface.IServer
@@ -24,7 +24,7 @@ var GlobalObject *GlobalObj
 
 // 加载json
 func (s *GlobalObj) Reload() {
-	data, err := ioutil.ReadFile("myDemo/OhioV0.5/conf/ohio.json")
+	data, err := ioutil.ReadFile("example/ohioV0.5/conf/ohio.json")
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func init() {
 		TcpServer:      nil,
 		Host:           "0.0.0.0",
 		TcpPort:        8999,
-		Name:           "OhioServerApp",
+		Name:           "ohioServerApp",
 		Version:        "V0.7",
 		MaxConn:        1000,
 		MaxPackageSize: 4096,

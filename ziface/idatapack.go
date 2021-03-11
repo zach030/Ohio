@@ -1,5 +1,6 @@
 package ziface
 
+//todo 自定义协议
 //解决tcp封包拆包
 type IDataPack interface {
 	//获取包头长度

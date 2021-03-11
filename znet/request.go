@@ -1,6 +1,6 @@
 package znet
 
-import "Ohio/ziface"
+import "ohio/ziface"
 
 type Request struct {
 	//已经与客户端建立好的连接

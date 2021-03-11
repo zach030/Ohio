@@ -1,12 +1,12 @@
 package znet
 
 import (
-	"Ohio/utils"
-	"Ohio/ziface"
 	"errors"
 	"fmt"
 	"io"
 	"net"
+	"ohio/utils"
+	"ohio/ziface"
 	"sync"
 )
 
